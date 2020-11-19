@@ -62,7 +62,7 @@ static char *out_names[] = {
 static int outputs[ARRAY_SIZE(out_names) * 2];
 static size_t noutputs;
 
-static void add_output(int id)
+static inline void add_output(int id)
 {
 	if (noutputs >= ARRAY_SIZE(outputs)) {
 		fprintf(stderr, "too many outputs defined, "
@@ -72,6 +72,12 @@ static void add_output(int id)
 	}
 
 	outputs[noutputs++] = id;
+}
+
+static inline void add_uniq_output(int id)
+{
+	if (output_id_to_number(id) < 0)
+		add_output(id);
 }
 
 static int output_name_to_id(const char *name, size_t namesz)
