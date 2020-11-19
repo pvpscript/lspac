@@ -74,7 +74,7 @@ static void add_output(int id)
 	outputs[noutputs++] = id;
 }
 
-static int column_name_to_id(const char *name, size_t namesz)
+static int output_name_to_id(const char *name, size_t namesz)
 {
 	size_t i;
 
