@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <getopt.h>
+#include <alpm.h>
 
 #include "args.h"
 
@@ -33,33 +34,38 @@ enum {
         OUT_VERSION
 };
 
-static char *out_names[] = {
-	[OUT_DBNAME] = "DBNAME",
-        [OUT_NAME] = "NAME",
-        [OUT_FILENAME] = "FILENAME",
-        [OUT_DESC] = "DESC",
-        [OUT_ARCH] = "ARCH",
-        [OUT_URL] = "URL",
-        [OUT_PACKAGER] = "PACKAGER",
-        [OUT_LICENSES] = "LICENSES",
-        [OUT_GROUPS] = "GROUPS",
-        [OUT_PROVIDES] = "PROVIDES",
-        [OUT_DEPENDS] = "DEPENDS",
-        [OUT_OPTDEPENDS] = "OPTDEPENDS",
-        [OUT_CONFLICTS] = "CONFLICTS",
-        [OUT_REPLACES] = "REPLACES",
-        [OUT_CHECKDEPENDS] = "CHECKDEPENDS",
-        [OUT_MAKEDEPENDS] = "MAKEDEPENDS",
-        [OUT_SIZE] = "SIZE",
-        [OUT_BUILDDATE] = "BUILDDATE",
-        [OUT_INSTALLDATE] = "INSTALLDATE",
-        [OUT_SCRIPTLET] = "SCRIPTLET",
-        [OUT_VALIDATION] = "VALIDATION",
-        [OUT_REASON] = "REASON",
-        [OUT_VERSION] = "VERSION"
+struct outinfo {
+	char *name;
+	void (*get_values)(const void *pkg);
 };
 
-static int outputs[ARRAY_SIZE(out_names) * 2];
+static struct outinfo infos[] = {
+	[OUT_DBNAME] 		= { "DBNAME", NULL },
+        [OUT_NAME] 		= { "NAME", NULL },
+        [OUT_FILENAME] 		= { "FILENAME", NULL },
+        [OUT_DESC] 		= { "DESC", NULL },
+        [OUT_ARCH] 		= { "ARCH", NULL },
+        [OUT_URL] 		= { "URL", NULL },
+        [OUT_PACKAGER] 		= { "PACKAGER", NULL },
+        [OUT_LICENSES] 		= { "LICENSES", NULL },
+        [OUT_GROUPS] 		= { "GROUPS", NULL },
+        [OUT_PROVIDES] 		= { "PROVIDES", NULL },
+        [OUT_DEPENDS] 		= { "DEPENDS", NULL },
+        [OUT_OPTDEPENDS] 	= { "OPTDEPENDS", NULL },
+        [OUT_CONFLICTS] 	= { "CONFLICTS", NULL },
+        [OUT_REPLACES] 		= { "REPLACES", NULL },
+        [OUT_CHECKDEPENDS]	= { "CHECKDEPENDS", NULL },
+        [OUT_MAKEDEPENDS] 	= { "MAKEDEPENDS", NULL },
+        [OUT_SIZE] 		= { "SIZE", NULL },
+        [OUT_BUILDDATE] 	= { "BUILDDATE", NULL },
+        [OUT_INSTALLDATE] 	= { "INSTALLDATE", NULL },
+        [OUT_SCRIPTLET] 	= { "SCRIPTLET", NULL },
+        [OUT_VALIDATION] 	= { "VALIDATION", NULL },
+        [OUT_REASON] 		= { "REASON", NULL },
+        [OUT_VERSION] 		= { "VERSION", NULL },
+};
+
+static int outputs[ARRAY_SIZE(infos) * 2];
 static size_t noutputs;
 
 static inline void add_output(int id)
@@ -74,6 +80,17 @@ static inline void add_output(int id)
 	outputs[noutputs++] = id;
 }
 
+static int output_id_to_number(int id)
+{
+	size_t i;
+
+	for (i = 0; i < noutputs; i++)
+		if (outputs[i] == id)
+			return i;
+
+	return -1;
+}
+
 static inline void add_uniq_output(int id)
 {
 	if (output_id_to_number(id) < 0)
@@ -84,23 +101,12 @@ static int output_name_to_id(const char *name, size_t namesz)
 {
 	size_t i;
 
-	for (i = 0; i < ARRAY_SIZE(out_names); i++)
-		if (!strncasecmp(name, out_names[i], namesz) &&
-		    !*(out_names[i] + namesz))
+	for (i = 0; i < ARRAY_SIZE(infos); i++)
+		if (!strncasecmp(name, infos[i].name, namesz) &&
+		    !*(infos[i].name + namesz))
 			return i;
 
 	fprintf(stderr, "unknown output: %s", name);
-	return -1;
-}
-
-static int output_id_to_number(int id)
-{
-	size_t i;
-
-	for (i = 0; i < noutputs; i++)
-		if (outputs[i] == id)
-			return i;
-
 	return -1;
 }
 
