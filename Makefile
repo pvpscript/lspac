@@ -5,7 +5,7 @@ CFLAGS = ${DEBUG} ${LIBS} -std=c99 -pedantic -Wall
 
 PREFIX = /usr/local
 
-SRC = container.c containerutils.c op.c args.c lspac.c
+SRC = container.c containerutils.c op.c args.c memutils.c lspac.c
 OBJ = ${SRC:.c=.o}
 
 all: lspac 
@@ -13,7 +13,7 @@ all: lspac
 .c.o:
 	${CC} -c ${CFLAGS} $<
 
-${OBJ}: container.h containerutils.h op.h args.h lspac.h
+${OBJ}: container.h containerutils.h op.h args.h memutils.h lspac.h
 
 lspac: ${OBJ}
 	${CC} -o $@ ${OBJ} ${CFLAGS}
