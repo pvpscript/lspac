@@ -113,3 +113,21 @@ struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix)
 
 	return c;
 }
+
+struct container *get_validation(alpm_pkgvalidation_t v, char *prefix)
+{
+	struct container *c = empty_container(prefix);
+
+	if (v == ALPM_PKG_VALIDATION_UNKNOWN)
+		put_str_alloc(c, "Unknown");
+	if (v & ALPM_PKG_VALIDATION_NONE)
+		put_str_alloc(c, "None");
+	if (v & ALPM_PKG_VALIDATION_MD5SUM)
+		put_str_alloc(c, "MD5");
+	if (v & ALPM_PKG_VALIDATION_SHA256SUM)
+		put_str_alloc(c, "SHA-256");
+	if (v & ALPM_PKG_VALIDATION_SIGNATURE)
+		put_str_alloc(c, "Signature");
+
+	return c;
+}
