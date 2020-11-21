@@ -139,6 +139,9 @@ void print_lspac(struct container *c)
 
 int main(int argc, char **argv)
 {
+	int ret = 0;
+	char *outarg = NULL;
+
         char c;
         int opt_index = 0;
         static struct option long_options[] = {
@@ -152,7 +155,6 @@ int main(int argc, char **argv)
                 {"show-null",   no_argument,            NULL,   's'},
         };
 
-
         while ((c = getopt_long(argc, argv, "d:o:bepsuv", long_options,
 				&opt_index)) != -1) {
                 switch(c) {
@@ -160,6 +162,7 @@ int main(int argc, char **argv)
 			printf("delim: %s\n", optarg);
 			break;
 		case 'o':
+			outarg = optarg;
 			printf("output: %s\n", optarg);
 			break;
 		case 'b':
@@ -195,8 +198,19 @@ int main(int argc, char **argv)
                 add_uniq_output(OUT_VERSION);
         }
 
+	if (outarg && add_out_to_idarray(outarg, outputs, ARRAY_SIZE(outputs),
+					 &noutputs, output_name_to_id) < 0) {
+		ret = EXIT_FAILURE;
+		goto release;
+	}
 
+	for (size_t i = 0; i < noutputs; i++)
+		printf("%d\n", outputs[i]);
+		
+
+
+release:
 	alpm_release(handle);
 
-	return 0;
+	return ret;
 }
