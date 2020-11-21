@@ -13,7 +13,7 @@ all: lspac
 .c.o:
 	${CC} -c ${CFLAGS} $<
 
-${OBJ}: container.h containerutils.h op.h strutils.h memutils.h lspac.h
+${OBJ}: container.h containerutils.h op.h strutils.h memutils.h 
 
 lspac: ${OBJ}
 	${CC} -o $@ ${OBJ} ${CFLAGS}
