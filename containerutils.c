@@ -114,6 +114,18 @@ struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix)
 	return c;
 }
 
+struct container *has_scriptlet(int b, char *prefix)
+{
+	return str_to_container(b ? "Yes" : "No", prefix);
+}
+
+struct container *get_reason(alpm_pkgreason_t r, char *prefix)
+{
+	int expl = r == ALPM_PKG_REASON_EXPLICIT;
+
+	return str_to_container(expl ? "Explicit" : "Dependency", prefix);
+}
+
 struct container *get_validation(alpm_pkgvalidation_t v, char *prefix)
 {
 	struct container *c = empty_container(prefix);
