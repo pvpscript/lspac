@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "container.h"
+#include "memutils.h"
 
 struct container {
 	char *prefix;
@@ -11,7 +12,7 @@ struct container {
 
 struct container *empty_container(char *prefix)
 {
-	struct container *c = malloc(sizeof (struct container));
+	struct container *c = c_malloc(sizeof (struct container));
 
 	c->prefix = prefix;
 	c->arr = NULL;
@@ -33,9 +34,9 @@ void put_str_alloc(struct container *c, char *str)
 	if (str != NULL) {
 		strsz = strlen(str) + 1;
 
-		c->arr = realloc(c->arr, sizeof (char **) * (c->len+2)); /* c_realloc (checked realloc, which finishes the program with perror("malloc");) */
+		c->arr = c_realloc(c->arr, sizeof (char **) * (c->len+2));
 
-		c->arr[c->len] = malloc(sizeof (char *) * strsz); /* c_malloc */
+		c->arr[c->len] = c_malloc(sizeof (char *) * strsz);
 		strncpy(c->arr[c->len], str, strsz);
 
 		c->arr[++c->len] = NULL;
@@ -44,7 +45,7 @@ void put_str_alloc(struct container *c, char *str)
 
 void put_str(struct container *c, char *str)
 {
-        c->arr = realloc(c->arr, sizeof (char **) * (c->len+2));
+        c->arr = c_realloc(c->arr, sizeof (char **) * (c->len+2));
         c->arr[c->len] = str;
         c->arr[++c->len] = NULL;
 }
