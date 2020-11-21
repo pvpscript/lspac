@@ -2,20 +2,30 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <getopt.h>
-#include <alpm.h>
 
+#include "container.h"
+#include "op.h"
 #include "args.h"
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
+
 enum {
-	OUT_DBNAME = 0,
-        OUT_NAME,
+        OUT_NAME = 0,
+	OUT_DBNAME,
+	OUT_BASENAME,
         OUT_FILENAME,
+        OUT_VERSION,
         OUT_DESC,
         OUT_ARCH,
         OUT_URL,
         OUT_PACKAGER,
+        OUT_SIZE,
+        OUT_BUILDDATE,
+        OUT_INSTALLDATE,
+        OUT_SCRIPTLET,
+        OUT_VALIDATION,
+        OUT_REASON,
         OUT_LICENSES,
         OUT_GROUPS,
         OUT_PROVIDES,
@@ -25,44 +35,41 @@ enum {
         OUT_REPLACES,
         OUT_CHECKDEPENDS,
         OUT_MAKEDEPENDS,
-        OUT_SIZE,
-        OUT_BUILDDATE,
-        OUT_INSTALLDATE,
-        OUT_SCRIPTLET,
-        OUT_VALIDATION,
-        OUT_REASON,
-        OUT_VERSION
 };
 
 struct outinfo {
 	char *name;
-	void (*get_values)(const void *pkg);
+	struct container *(*get_values)(void *, char *);
 };
 
 static struct outinfo infos[] = {
-	[OUT_DBNAME] 		= { "DBNAME", NULL },
-        [OUT_NAME] 		= { "NAME", NULL },
-        [OUT_FILENAME] 		= { "FILENAME", NULL },
-        [OUT_DESC] 		= { "DESC", NULL },
-        [OUT_ARCH] 		= { "ARCH", NULL },
-        [OUT_URL] 		= { "URL", NULL },
-        [OUT_PACKAGER] 		= { "PACKAGER", NULL },
-        [OUT_LICENSES] 		= { "LICENSES", NULL },
-        [OUT_GROUPS] 		= { "GROUPS", NULL },
-        [OUT_PROVIDES] 		= { "PROVIDES", NULL },
-        [OUT_DEPENDS] 		= { "DEPENDS", NULL },
-        [OUT_OPTDEPENDS] 	= { "OPTDEPENDS", NULL },
-        [OUT_CONFLICTS] 	= { "CONFLICTS", NULL },
-        [OUT_REPLACES] 		= { "REPLACES", NULL },
-        [OUT_CHECKDEPENDS]	= { "CHECKDEPENDS", NULL },
-        [OUT_MAKEDEPENDS] 	= { "MAKEDEPENDS", NULL },
-        [OUT_SIZE] 		= { "SIZE", NULL },
-        [OUT_BUILDDATE] 	= { "BUILDDATE", NULL },
-        [OUT_INSTALLDATE] 	= { "INSTALLDATE", NULL },
-        [OUT_SCRIPTLET] 	= { "SCRIPTLET", NULL },
-        [OUT_VALIDATION] 	= { "VALIDATION", NULL },
-        [OUT_REASON] 		= { "REASON", NULL },
-        [OUT_VERSION] 		= { "VERSION", NULL },
+	/* single value */
+        [OUT_NAME] 		= { "NAME", &lspac_pkg_get_name },
+	[OUT_DBNAME] 		= { "DBNAME", &lspac_db_get_name },
+	[OUT_BASENAME]		= { "BASENAME", &lspac_pkg_get_base },
+        [OUT_FILENAME] 		= { "FILENAME", &lspac_pkg_get_filename },
+	[OUT_VERSION]		= { "VERSION", &lspac_pkg_get_version },
+        [OUT_DESC] 		= { "DESC", &lspac_pkg_get_desc },
+        [OUT_ARCH] 		= { "ARCH", &lspac_pkg_get_arch },
+        [OUT_URL] 		= { "URL", &lspac_pkg_get_url },
+        [OUT_PACKAGER] 		= { "PACKAGER", &lspac_pkg_get_packager },
+        [OUT_SIZE] 		= { "SIZE", &lspac_pkg_get_isize },
+        [OUT_BUILDDATE] 	= { "BUILDDATE", &lspac_pkg_get_builddate },
+        [OUT_INSTALLDATE] 	= { "INSTALLDATE", &lspac_pkg_get_installdate },
+        [OUT_SCRIPTLET] 	= { "SCRIPTLET", &lspac_pkg_has_scriptlet },
+        [OUT_VALIDATION] 	= { "VALIDATION", &lspac_pkg_get_validation },
+        [OUT_REASON] 		= { "REASON", &lspac_pkg_get_reason },
+
+	/* might have multiple values */
+        [OUT_LICENSES] 		= { "LICENSES", &lspac_pkg_get_licenses },
+        [OUT_GROUPS] 		= { "GROUPS", &lspac_pkg_get_groups },
+        [OUT_PROVIDES] 		= { "PROVIDES", &lspac_pkg_get_provides },
+        [OUT_DEPENDS] 		= { "DEPENDS", &lspac_pkg_get_depends },
+        [OUT_OPTDEPENDS] 	= { "OPTDEPENDS", &lspac_pkg_get_optdepends },
+        [OUT_CONFLICTS] 	= { "CONFLICTS", &lspac_pkg_get_conflicts },
+        [OUT_REPLACES] 		= { "REPLACES", &lspac_pkg_get_replaces },
+        [OUT_CHECKDEPENDS]	= { "CHECKDEPENDS", &lspac_pkg_get_checkdepends },
+        [OUT_MAKEDEPENDS] 	= { "MAKEDEPENDS", &lspac_pkg_get_makedepends },
 };
 
 static int outputs[ARRAY_SIZE(infos) * 2];
