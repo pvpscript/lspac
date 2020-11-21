@@ -17,6 +17,17 @@ struct container *str_to_container(char *str, char *prefix)
 	return c;
 }
 
+struct container *list_to_container(alpm_list_t *list, char *prefix)
+{
+        struct container *c = empty_container(prefix);
+        alpm_list_t *v;
+
+        FOREACH_ALPM_ITEM(v, list)
+                put_str_alloc(c, v->data);
+
+        return c;
+}
+
 struct container *get_depends(alpm_list_t *list, char *prefix)
 {
 	struct container *c = empty_container(prefix);

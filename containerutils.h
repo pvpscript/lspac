@@ -1,8 +1,6 @@
 #ifndef CONTAINERUTILS_H
 #define CONTAINERUTILS_H
 
-#define _POSIX_C_SOURCE 1
-
 #include <alpm.h>
 
 #include "container.h"
@@ -13,6 +11,7 @@
 
 
 struct container *str_to_container(char *str, char *prefix);
+struct container *list_to_container(alpm_list_t *list, char *prefix);
 struct container *get_depends(alpm_list_t *list, char *prefix);
 struct container *get_time(alpm_time_t time, char *prefix);
 struct container *get_size(off_t size, char *prefix);
