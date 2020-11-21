@@ -15,5 +15,20 @@ struct container *lspac_pkg_get_packager(void *data, char *prefix);
 struct container *lspac_pkg_get_md5sum(void *data, char *prefix);
 struct container *lspac_pkg_get_sha256sum(void *data, char *prefix);
 struct container *lspac_pkg_get_base64_sig(void *data, char *prefix);
+struct container *lspac_pkg_get_licenses(void *data, char *prefix);
+struct container *lspac_pkg_get_groups(void *data, char *prefix);
+struct container *lspac_pkg_get_provides(void *data, char *prefix);
+struct container *lspac_pkg_get_depends(void *data, char *prefix);
+struct container *lspac_pkg_get_optdepends(void *data, char *prefix);
+struct container *lspac_pkg_get_conflicts(void *data, char *prefix);
+struct container *lspac_pkg_get_replaces(void *data, char *prefix);
+struct container *lspac_pkg_get_checkdepends(void *data, char *prefix);
+struct container *lspac_pkg_get_makedepends(void *data, char *prefix);
+struct container *lspac_pkg_get_isize(void *data, char *prefix);
+struct container *lspac_pkg_get_builddate(void *data, char *prefix);
+struct container *lspac_pkg_get_installdate(void *data, char *prefix);
+struct container *lspac_pkg_has_scriptlet(void *data, char *prefix);
+struct container *lspac_pkg_get_validation(void *data, char *prefix);
+struct container *lspac_pkg_get_reason(void *data, char *prefix);
 
 #endif /* OP_H */
