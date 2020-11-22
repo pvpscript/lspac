@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "strutils.h"
+#include "../include/strutils.h"
 
 // convert VALUE1,VALUE2,VALUE3,... string to enum keys
 static int str_to_idarray(char *list, int *arr, size_t arrsz,

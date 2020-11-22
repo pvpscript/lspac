@@ -3,10 +3,10 @@
 #include <strings.h>
 #include <getopt.h>
 
-#include "strutils.h"
-#include "container.h"
-#include "containerutils.h"
-#include "op.h"
+#include "../include/strutils.h"
+#include "../include/container.h"
+#include "../include/containerutils.h"
+#include "../include/op.h"
 
 #define FOREACH_STR(str, index, arr) \
 	for ((index) = 0; (arr) && ((str) = ((arr)[(index)])); \

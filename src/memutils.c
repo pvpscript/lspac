@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "memutils.h"
+#include "../include/memutils.h"
 
 void *c_malloc(size_t size)
 {

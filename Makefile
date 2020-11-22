@@ -1,33 +1,39 @@
 CC = cc
 DEBUG = -g
 LIBS=-l alpm
-CFLAGS = ${DEBUG} ${LIBS} -std=c99 -pedantic -Wall
+CFLAGS = ${DEBUG} ${LIBS} -Iinclude -std=c99 -pedantic -Wall
+
+BIN = lspac
 
 PREFIX = /usr/local
 
-SRC = container.c containerutils.c op.c strutils.c memutils.c lspac.c
-OBJ = ${SRC:.c=.o}
+SRC_DIR = src
+OBJ_DIR = obj
 
-all: lspac 
+SRC = ${wildcard ${SRC_DIR}/*.c}
+OBJ = ${SRC:${SRC_DIR}/%.c=${OBJ_DIR}/%.o}
 
-.c.o:
-	${CC} -c ${CFLAGS} $<
+all: ${OBJ_DIR} ${BIN} 
 
-${OBJ}: container.h containerutils.h op.h strutils.h memutils.h 
+${OBJ_DIR}:
+	mkdir -p $@
 
-lspac: ${OBJ}
-	${CC} -o $@ ${OBJ} ${CFLAGS}
+${OBJ_DIR}/%.o: ${SRC_DIR}/%.c
+	${CC} -c ${CFLAGS} $< -o $@
+
+${BIN}: ${OBJ}
+	${CC} ${CFLAGS} ${LIBS} -o $@ ${OBJ}
 
 clean:
-	rm -f lspac ${OBJ}
+	rm -rf ${BIN} ${OBJ_DIR}
 
 install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
-	cp -f fntfs ${DESTDIR}${PREFIX}/bin
-	chmod 755 ${DESTDIR}${PREFIX}/bin/lspac
+	cp -f ${BIN} ${DESTDIR}${PREFIX}/bin
+	chmod 755 ${DESTDIR}${PREFIX}/bin/${BIN}
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/lspac
+	rm -f ${DESTDIR}${PREFIX}/bin/${BIN}
 
 .PHONY: all clean install uninstall
 

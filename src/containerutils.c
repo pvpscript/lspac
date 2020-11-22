@@ -2,8 +2,8 @@
 #include <time.h>
 #include <alpm.h>
 
-#include "container.h"
-#include "containerutils.h"
+#include "../include/container.h"
+#include "../include/containerutils.h"
 
 static int time_raw;
 static int size_raw;

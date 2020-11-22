@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <alpm.h>
 
-#include "container.h"
-#include "containerutils.h"
+#include "../include/container.h"
+#include "../include/containerutils.h"
 
 struct container *lspac_pkg_get_name(void *data, char *prefix)
 {

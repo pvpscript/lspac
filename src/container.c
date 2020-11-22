@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "container.h"
-#include "memutils.h"
+#include "../include/container.h"
+#include "../include/memutils.h"
 
 struct container {
 	char *prefix;
