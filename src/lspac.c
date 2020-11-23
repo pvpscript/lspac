@@ -23,8 +23,6 @@
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 
-static alpm_handle_t *handle;
-
 struct config {
 	char delim;
 	char surround;
@@ -242,6 +240,7 @@ int main(int argc, char **argv)
 	};
 	char *outarg = NULL;
 
+	alpm_handle_t *handle;
 	alpm_db_t *db;
 	alpm_pkg_t *pkg;
 	alpm_list_t *pkg_list = NULL;
