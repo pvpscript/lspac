@@ -42,7 +42,7 @@ struct container *get_depends(alpm_list_t *list, char *prefix)
 struct container *get_time(alpm_time_t time, char *prefix)
 {
 	struct container *c = empty_container(prefix);
-	time_t _time = *((time_t *)time);
+	time_t _time = (time_t)time;
 	struct tm *ltime;
 	char buf[50];
 
