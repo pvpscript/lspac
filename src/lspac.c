@@ -127,26 +127,6 @@ static int output_id_to_number(int id)
 	return -1;
 }
 
-static inline void add_squeeze_output(int id, size_t i)
-{
-	size_t offset;
-
-	if (noutputs >= ARRAY_SIZE(outputs)) {
-		fprintf(stderr, "too many outputs defined, "
-				"the limit is %lu values",
-				ARRAY_SIZE(outputs) - 1);
-		exit(EXIT_FAILURE);
-	}
-	if (i > noutputs) {
-		fprintf(stderr, "array index %lu is out of bounds", i);
-		exit(EXIT_FAILURE);
-	}
-
-	offset = (noutputs++ - i) * sizeof (int);
-	memmove(&outputs[i+1], outputs, offset);
-	outputs[i] = id;
-}
-
 static inline void add_uniq_output(int id)
 {
 	if (output_id_to_number(id) < 0)
@@ -358,19 +338,13 @@ int main(int argc, char **argv)
 	if (optind == argc) {
 		fprintf(stderr, "Must provide at least one package name\n");
 		exit(EXIT_FAILURE);
-	} else if (argc - optind == 1) {
-		//single package
-		pkg = alpm_db_get_pkg(db, argv[optind++]);
-		// make alpmutils to handle packages not found and put a meta loop for the alpm_list
-		pkg_list = alpm_list_add(pkg_list, pkg);
-	} else {
-		//multiple packages, package name will be displayed!
-		add_squeeze_output(OUT_NAME, 0);
-
+	} else if (argc > optind) {
+		// one or more packages given
 		for (; optind < argc; optind++) {
 			pkg = alpm_db_get_pkg(db, argv[optind]);
 			pkg_list = alpm_list_add(pkg_list, pkg);
 		}
+		// make alpmutils to handle packages not found and put a meta loop for the alpm_list
 	}
 
 	printf("optind:%d -> argc:%d\n", optind, argc);
