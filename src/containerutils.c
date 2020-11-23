@@ -5,8 +5,13 @@
 #include "../include/container.h"
 #include "../include/containerutils.h"
 
-static int time_raw;
-static int size_raw;
+static unsigned bitmask;
+
+
+void set_bitmask(unsigned mask)
+{
+	bitmask = mask;
+}
 
 struct container *str_to_container(char *str, char *prefix)
 {
@@ -47,7 +52,7 @@ struct container *get_time(alpm_time_t time, char *prefix)
 	char buf[50];
 
 	if (time) {
-		if (time_raw) {
+		if (bitmask & OPT_UNIX) {
 			snprintf(buf, 50, "%lld", (long long)time);
 		} else {
 			ltime = localtime(&_time);
@@ -76,7 +81,7 @@ struct container *get_size(off_t size, char *prefix)
 	struct container *c = empty_container(prefix);
 	char buf[50];
 
-	if (size_raw)
+	if (bitmask & OPT_BYTES)
 		snprintf(buf, 50, "%lld", (long long)size);
 	else
 		fmt_human_readable_size(size, buf);

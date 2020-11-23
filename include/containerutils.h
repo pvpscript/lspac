@@ -10,6 +10,21 @@
 	for ((ptr) = list; (ptr); (ptr) = alpm_list_next((ptr)))
 
 
+/* 
+ * options to be handled.
+ *
+ * overkill, scalable, or simply shenanigans? :)
+ */
+enum {
+        OPT_BYTES 	= (1 << 0),
+        OPT_UNIX 	= (1 << 1)
+};
+
+/*
+ * sets the bitmask according to the enum flags
+ */
+void set_bitmask(unsigned mask);
+
 struct container *str_to_container(char *str, char *prefix);
 struct container *list_to_container(alpm_list_t *list, char *prefix);
 struct container *get_depends(alpm_list_t *list, char *prefix);
