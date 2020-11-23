@@ -16,7 +16,7 @@ struct container *lspac_pkg_get_base(void *data, char *prefix)
 
 struct container *lspac_db_get_name(void *data, char *prefix)
 {
-	return str_to_container((char *)alpm_db_get_name(data), prefix);
+	return get_dbname(alpm_pkg_get_db(data), prefix);
 }
 
 struct container *lspac_pkg_get_filename(void *data, char *prefix)

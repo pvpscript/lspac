@@ -119,6 +119,11 @@ struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix)
 	return c;
 }
 
+struct container *get_dbname(alpm_db_t *db, char *prefix)
+{
+	return str_to_container((char *)alpm_db_get_name(db), prefix);
+}
+
 struct container *has_scriptlet(int b, char *prefix)
 {
 	return str_to_container(b ? "Yes" : "No", prefix);
