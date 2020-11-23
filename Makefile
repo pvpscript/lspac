@@ -6,9 +6,11 @@ CFLAGS = ${DEBUG} ${LIBS} -Iinclude -std=c99 -pedantic -Wall
 BIN = lspac
 
 PREFIX = /usr/local
+MANPREFIX = ${PREFIX}/share/man
 
 SRC_DIR = src
 OBJ_DIR = obj
+MAN_DIR = doc
 
 SRC = ${wildcard ${SRC_DIR}/*.c}
 OBJ = ${SRC:${SRC_DIR}/%.c=${OBJ_DIR}/%.o}
@@ -31,9 +33,13 @@ install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp -f ${BIN} ${DESTDIR}${PREFIX}/bin
 	chmod 755 ${DESTDIR}${PREFIX}/bin/${BIN}
+	mkdir -p ${DESTDIR}${MANPREFIX}/man1
+	cp -f ${MAN_DIR}/${BIN}.1 ${DESTDIR}${MANPREFIX}/man1/${BIN}.1
+	chmod 644 ${DESTDIR}${MANPREFIX}/man1/${BIN}.1
 
 uninstall:
 	rm -f ${DESTDIR}${PREFIX}/bin/${BIN}
+	rm -f ${DESTDIR}${MANPREFIX}/man1/${BIN}.1
 
 .PHONY: all clean install uninstall
 
