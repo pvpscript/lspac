@@ -1,16 +1,17 @@
+SRC_DIR = src
+OBJ_DIR = obj
+MAN_DIR = doc
+INC_DIR = include
+
 CC = cc
 DEBUG = -g
 LIBS=-l alpm
-CFLAGS = ${DEBUG} ${LIBS} -Iinclude -std=c99 -pedantic -Wall
+CFLAGS = ${DEBUG} ${LIBS} -I${INC_DIR} -std=c99 -pedantic -Wall
 
 BIN = lspac
 
 PREFIX = /usr/local
 MANPREFIX = ${PREFIX}/share/man
-
-SRC_DIR = src
-OBJ_DIR = obj
-MAN_DIR = doc
 
 SRC = ${wildcard ${SRC_DIR}/*.c}
 OBJ = ${SRC:${SRC_DIR}/%.c=${OBJ_DIR}/%.o}
