@@ -13,13 +13,6 @@
 #define DEFAULT_DELIM 32 /* space */
 #define DEFAULT_SURROUND 34 /* double quotes */
 
-#define FOREACH_STR_DESTRUCTIVE(str, index, arr) \
-	for ((index) = 0; (arr) && ((str) = ((arr)[(index)])); \
-	     free((str)), (index)++)
-
-#define FOREACH_STR(str, index, arr) \
-	for ((index) = 0; (arr) && ((str) = ((arr)[(index)])); (index)++)
-
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 
@@ -151,9 +144,12 @@ static void print_lspac(struct container *c, struct config cfg)
 	char *str;
 	size_t i;
 
-	printf("\n%s\n", get_container_prefix(c));
+/*	printf("\n%s\n", get_container_prefix(c));*/
+	if (cfg.pairs)
+		printf("%s=%c", get_container_prefix(c), cfg.surround);
 	FOREACH_STR_DESTRUCTIVE(str, i, get_container_arr(c))
-		printf("%s\n", str);
+		printf("%s%c", str, cfg.delim);
+	printf("%c%c\n", cfg.surround, cfg.delim);
 	destroy_container(c);
 }
 
@@ -221,9 +217,11 @@ int main(int argc, char **argv)
 	char *outarg = NULL;
 
 	alpm_handle_t *handle;
-	alpm_db_t *db;
-	alpm_pkg_t *pkg;
 	alpm_list_t *pkg_list = NULL;
+	alpm_list_t *v;
+	alpm_pkg_t *pkg;
+	alpm_db_t *db;
+	char *pkgarg;
 
 	struct container *con;
 
@@ -339,27 +337,30 @@ int main(int argc, char **argv)
 		fprintf(stderr, "Must provide at least one package name\n");
 		exit(EXIT_FAILURE);
 	} else if (argc > optind) {
-		// one or more packages given
 		for (; optind < argc; optind++) {
-			pkg = alpm_db_get_pkg(db, argv[optind]);
-			pkg_list = alpm_list_add(pkg_list, pkg);
+			pkgarg = argv[optind];
+
+			if ((pkg = alpm_db_get_pkg(db, pkgarg))) {
+				pkg_list = alpm_list_add(pkg_list, pkg);
+			} else {
+				fprintf(stderr, "Package %s not found.\n", pkgarg);
+				exit(EXIT_FAILURE);
+			}
 		}
-		// make alpmutils to handle packages not found and put a meta loop for the alpm_list
 	}
 
-	printf("optind:%d -> argc:%d\n", optind, argc);
+	FOREACH_ALPM_ITEM(v, pkg_list) {
+		for (size_t i = 0; i < noutputs; i++) {
+			con = infos[outputs[i]].get_values(v->data,
+					infos[outputs[i]].name);
 
-	for (size_t i = 0; i < noutputs; i++) {
-		con = infos[outputs[i]].get_values(
-				pkg, infos[outputs[i]].name);
-		print_lspac(con, cfg);
+			/* just to test! this print function doesn't really work */
+			print_lspac(con, cfg);
+		}
 	}
 
-		//printf("%d\n", outputs[i]);
-		
-
-	alpm_release(handle);
 	alpm_list_free(pkg_list);
+	alpm_release(handle);
 
 	return 0;
 }
