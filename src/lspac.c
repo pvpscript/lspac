@@ -10,24 +10,34 @@
 #include "../include/containerutils.h"
 #include "../include/op.h"
 
-#define DEFAULT_DELIM 32 /* space */
+#define DEFAULT_DELIM_INNER 32 /* space */
+#define DEFAULT_DELIM_BETWEEN 9 /* tab */
 #define DEFAULT_SURROUND 34 /* double quotes */
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 
 
+/* so much very scalable!!1!eleven */
+enum {
+	OPT_PAIRS 	= (1 << 1),
+	OPT_LOCAL 	= (1 << 2),
+	OPT_SYNC 	= (1 << 3),
+};
+
 struct config {
-	char delim;
+	char delim_inner;
+	char delim_between;
 	char surround;
 
 	/* alpm initialization settings */
 	char *root;
 	char *dbpath;
 
-	/* if extra options are added, replace this with a bitmask */
-	int pairs; 
+	/* output option */
+	unsigned mask_output; 
 
-	unsigned bitmask;
+	/* inner options */
+	unsigned mask_inner;
 };
 
 enum {
@@ -141,15 +151,22 @@ static int output_name_to_id(const char *name, size_t namesz)
 
 static void print_lspac(struct container *c, struct config cfg)
 {
+	char **arr = get_container_arr(c);
 	char *str;
-	size_t i;
 
-/*	printf("\n%s\n", get_container_prefix(c));*/
-	if (cfg.pairs)
+	if (cfg.mask_output & OPT_PAIRS)
 		printf("%s=%c", get_container_prefix(c), cfg.surround);
-	FOREACH_STR_DESTRUCTIVE(str, i, get_container_arr(c))
-		printf("%s%c", str, cfg.delim);
-	printf("%c%c\n", cfg.surround, cfg.delim);
+	else
+		printf("%c", cfg.surround);
+	if (arr) {
+		printf("%s", *arr);
+		free(*(arr++));
+
+		FOREACH_STR_DESTRUCTIVE(str, arr)
+			printf("%c%s", cfg.delim_inner, str);
+	}
+	printf("%c", cfg.surround);
+
 	destroy_container(c);
 }
 
@@ -175,6 +192,16 @@ static void fmt_help(const char *cmd, const char *desc)
 	fprintf(stdout, "%s%*s%s\n", cmd, spacing, "", desc);
 }
 
+static void set_single_character(char *optarg, char *field_ref)
+{
+	if (strlen(optarg) > 1) {
+		fprintf(stderr, "Delimiter must be a single character\n");
+		exit(EXIT_FAILURE);
+	}
+
+	*field_ref = *optarg;
+}
+
 static void usage()
 {
 	size_t i;
@@ -186,19 +213,22 @@ static void usage()
 
 	puts("\nOptions:");
 	fmt_help(" -d, --dbpath", "database path");
+	fmt_help(" -f, --field-delim", "set the field delimiter (default: tab)");
+	fmt_help(" -i, --inner-delim", "set the inner values delimiter (default: space)");
 	fmt_help(" -o, --output", "output fields");
 	fmt_help(" -r, --root", "installation root");
-	fmt_help(" -D, --delim", "set field delimiter (default: tab)");
+	fmt_help(" -s, --surround", "character used to surround each output (default: double quotes)");
 	fmt_help(" -b, --bytes", "display size as bytes instead of human readable");
 	fmt_help(" -p, --pairs", "show outputs in a KEY=\"VALUE\" fashion");
 	fmt_help(" -u, --unix", "display dates as unix timestamp instead of human readable");
-	fmt_help(" -s, --show-null", "when the output is blank, it shows NULL instead of showing nothing");
+	fmt_help(" -w, --raw", "remove surrounding character");
 	fmt_help(" -B, --basic", "show basic informations about a package");
 	fmt_help(" -R, --relations", "show the relations of a given package");
+	fmt_help(" -O, --output-all", "shows every single available output");
 
 	fmt_help("\n -h, --help", "displays this help");
 
-	puts("\nAvailable output columns:");
+	puts("\nAvailable output values:");
 
 	for (i = 0; i < ARRAY_SIZE(infos); i++)
 		printf(" %14s %s\n", infos[i].name, infos[i].desc);
@@ -207,10 +237,11 @@ static void usage()
 int main(int argc, char **argv)
 {
 	struct config cfg = {
-		.delim = DEFAULT_DELIM,
+		.delim_inner = DEFAULT_DELIM_INNER,
+		.delim_between = DEFAULT_DELIM_BETWEEN,
 		.surround = DEFAULT_SURROUND,
-		.pairs = 0,
-		.bitmask = 0,
+		.mask_output = OPT_LOCAL & OPT_SYNC,
+		.mask_inner = 0,
 		.root = "/",
 		.dbpath = "/var/lib/pacman/"
 	};
@@ -229,17 +260,21 @@ int main(int argc, char **argv)
         int opt_index = 0;
         static struct option long_options[] = {
 		{"dbpath",	required_argument,	NULL,	'd'},
+                {"field-delim",	required_argument,      NULL,   'f'},
+                {"inner-delim",	required_argument,      NULL,   'i'},
                 {"output",      required_argument,      NULL,   'o'},
 		{"root",	required_argument,	NULL,	'r'},
-                {"delim",       required_argument,      NULL,   'D'},
-		{"output-all",	no_argument,		NULL,	'O'},
+		{"surround",	required_argument,	NULL,	's'},
+		{"dbext",	required_argument,	NULL,	'x'},
+		{"select-db",	required_argument,	NULL,	'S'}, /* select between local and sync */
                 {"bytes",       no_argument,            NULL,   'b'},
-                {"escape",      no_argument,            NULL,   'e'},
-		{"help",	no_argument,		NULL,	'h'},
                 {"pairs",       no_argument,            NULL,   'p'},
                 {"unix",        no_argument,            NULL,   'u'},
+		{"raw",		no_argument,		NULL,	'w'},
 		{"basic",	no_argument,		NULL,	'B'},
-		{"relations", 	no_argument,		NULL,	'R'}
+		{"relations", 	no_argument,		NULL,	'R'},
+		{"output-all",	no_argument,		NULL,	'O'},
+		{"help",	no_argument,		NULL,	'h'}
         };
 
 	/*
@@ -249,8 +284,8 @@ int main(int argc, char **argv)
 	 * dbext: add extra sync db extensions;
 	 */
 
-        while ((c = getopt_long(argc, argv, "d:o:r:D:bepsuBROh", long_options,
-				&opt_index)) != -1) {
+        while ((c = getopt_long(argc, argv, "d:f:i:o:s:r:x:S:bpuwBROh",
+				long_options, &opt_index)) != -1) {
                 switch(c) {
 		case 'd':
 			puts(optarg);
@@ -258,35 +293,46 @@ int main(int argc, char **argv)
 			break;
 		case 'o':
 			outarg = optarg;
-			printf("output: %s\n", optarg);
 			break;
 		case 'r':
 			puts(optarg);
 			cfg.root = optarg;
 			break;
-		case 'D':
-			if (strlen(optarg) > 1) {
-				fprintf(stderr, "\nDelimiter must be a single character\n");
-				exit(EXIT_FAILURE);
-			}
-
-			cfg.delim = *optarg;
+		case 'f':
+			set_single_character(optarg, &cfg.delim_between);
 			break;
-		case 'O':
-			for (noutputs = 0; noutputs < ARRAY_SIZE(infos); noutputs++)
-				outputs[noutputs] = noutputs;
+		case 'i':
+			set_single_character(optarg, &cfg.delim_inner);
 			break;
 		case 'b':
-			cfg.bitmask |= OPT_BYTES;
-			break;
-		case 'e':
-			printf("escape\n"); /* might not be necessary */
+			cfg.mask_inner |= OPT_BYTES;
 			break;
 		case 'p':
-			cfg.pairs = 1;
+			cfg.mask_output |= OPT_PAIRS;
+			break;
+		case 's':
+			if (cfg.surround) /* check wether it's not raw */
+				set_single_character(optarg, &cfg.surround);
+			break;
+		case 'x':
+			break;
+		case 'S':
+			/* only local db available for now! */
+	
+			if (!strcmp(optarg, "local")) {
+				cfg.mask_output &= ~OPT_SYNC;
+			} else if (!strcmp(optarg, "sync")) {
+				cfg.mask_output &= ~OPT_LOCAL;
+			} else {
+				fprintf(stderr, "Unknown database %s\n", optarg);
+				exit(EXIT_FAILURE);
+			}
+			break;
+		case 'w':
+			cfg.surround = 0;
 			break;
 		case 'u':
-			cfg.bitmask |= OPT_UNIX;
+			cfg.mask_inner |= OPT_UNIX;
 			break;
 		case 'B':
 			add_uniq_output(OUT_PROVIDES);
@@ -309,14 +355,16 @@ int main(int argc, char **argv)
 			add_uniq_output(OUT_BUILDDATE);
 			add_uniq_output(OUT_INSTALLDATE);
 			break;
+		case 'O':
+			for (noutputs = 0; noutputs < ARRAY_SIZE(infos); noutputs++)
+				outputs[noutputs] = noutputs;
+			break;
 		case 'h':
 			usage();
 			break;
-		case '?':
-			printf("question mark, smiley face\n");
-			break;
 		default:
-			printf("default\n");
+			fprintf(stderr, "Try 'lspac --help' for more information\n");
+			exit(EXIT_FAILURE);
                 }
         }
 
@@ -354,10 +402,12 @@ int main(int argc, char **argv)
 			con = infos[outputs[i]].get_values(v->data,
 					infos[outputs[i]].name);
 
-			/* just to test! this print function doesn't really work */
 			print_lspac(con, cfg);
+			if (i + 1 < noutputs)
+				putchar(cfg.delim_between); /* puts delimiter between packages */
 		}
 	}
+	putchar('\n'); /* puts newline to output */
 
 	alpm_list_free(pkg_list);
 	alpm_release(handle);
