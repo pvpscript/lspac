@@ -216,12 +216,12 @@ static void usage()
 	fmt_help(" -f, --field-delim", "set the field delimiter (default: tab)");
 	fmt_help(" -i, --inner-delim", "set the inner values delimiter (default: space)");
 	fmt_help(" -o, --output", "output fields");
-	fmt_help(" -r, --root", "installation root");
+	fmt_help(" -r, --root", "filesystem root");
 	fmt_help(" -s, --surround", "character used to surround each output (default: double quotes)");
-	fmt_help(" -b, --bytes", "display size as bytes instead of human readable");
+	fmt_help(" -b, --bytes", "display size as bytes, instead of human readable");
 	fmt_help(" -p, --pairs", "show outputs in a KEY=\"VALUE\" fashion");
-	fmt_help(" -u, --unix", "display dates as unix timestamp instead of human readable");
-	fmt_help(" -w, --raw", "remove surrounding character");
+	fmt_help(" -u, --unix", "display dates as unix timestamp, instead of human readable");
+	fmt_help(" -w, --raw", "remove surrounding character (overwrites -s)");
 	fmt_help(" -B, --basic", "show basic informations about a package");
 	fmt_help(" -R, --relations", "show the relations of a given package");
 	fmt_help(" -O, --output-all", "shows every single available output");
