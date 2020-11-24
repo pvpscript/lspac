@@ -34,6 +34,10 @@ Set the inner values delimiter (default: space).
 
 Set the output fields list (for more information, refer to `lspac --help`).
 
+`-p, --pkg-delim CHAR`
+
+Set the delimiter used between each prompted package.
+
 `-r, --root PATH`
 
 Set the filesystem root dir.
@@ -46,7 +50,7 @@ Set the character used to surround each output value (default: double quotes).
 
 Display package size as bytes, instead of human readable.
 
-`-p, --pairs`
+`-P, --pairs`
 
 Show outputs in a KEY="VALUE" fashion.
 

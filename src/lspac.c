@@ -11,7 +11,8 @@
 #include "../include/op.h"
 
 #define DEFAULT_DELIM_INNER 32 /* space */
-#define DEFAULT_DELIM_BETWEEN 9 /* tab */
+#define DEFAULT_DELIM_PKG 10 /* new line */
+#define DEFAULT_DELIM_FIELD 9 /* tab */
 #define DEFAULT_SURROUND 34 /* double quotes */
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
@@ -26,7 +27,8 @@ enum {
 
 struct config {
 	char delim_inner;
-	char delim_between;
+	char delim_field;
+	char delim_pkg;
 	char surround;
 
 	/* alpm initialization settings */
@@ -238,7 +240,8 @@ int main(int argc, char **argv)
 {
 	struct config cfg = {
 		.delim_inner = DEFAULT_DELIM_INNER,
-		.delim_between = DEFAULT_DELIM_BETWEEN,
+		.delim_field = DEFAULT_DELIM_FIELD,
+		.delim_pkg = DEFAULT_DELIM_PKG,
 		.surround = DEFAULT_SURROUND,
 		.mask_output = OPT_LOCAL & OPT_SYNC,
 		.mask_inner = 0,
@@ -263,17 +266,18 @@ int main(int argc, char **argv)
                 {"field-delim",	required_argument,      NULL,   'f'},
                 {"inner-delim",	required_argument,      NULL,   'i'},
                 {"output",      required_argument,      NULL,   'o'},
+		{"pkg-delim",	required_argument,	NULL,	'p'},
 		{"root",	required_argument,	NULL,	'r'},
 		{"surround",	required_argument,	NULL,	's'},
 		{"dbext",	required_argument,	NULL,	'x'},
 		{"select-db",	required_argument,	NULL,	'S'}, /* select between local and sync */
                 {"bytes",       no_argument,            NULL,   'b'},
-                {"pairs",       no_argument,            NULL,   'p'},
                 {"unix",        no_argument,            NULL,   'u'},
 		{"raw",		no_argument,		NULL,	'w'},
 		{"basic",	no_argument,		NULL,	'B'},
-		{"relations", 	no_argument,		NULL,	'R'},
 		{"output-all",	no_argument,		NULL,	'O'},
+                {"pairs",       no_argument,            NULL,   'P'},
+		{"relations", 	no_argument,		NULL,	'R'},
 		{"help",	no_argument,		NULL,	'h'}
         };
 
@@ -284,7 +288,7 @@ int main(int argc, char **argv)
 	 * dbext: add extra sync db extensions;
 	 */
 
-        while ((c = getopt_long(argc, argv, "d:f:i:o:s:r:x:S:bpuwBROh",
+        while ((c = getopt_long(argc, argv, "d:f:i:o:p:s:r:x:S:bpuwBOPRh",
 				long_options, &opt_index)) != -1) {
                 switch(c) {
 		case 'd':
@@ -294,12 +298,15 @@ int main(int argc, char **argv)
 		case 'o':
 			outarg = optarg;
 			break;
+		case 'p':
+			set_single_character(optarg, &cfg.delim_pkg);
+			break;
 		case 'r':
 			puts(optarg);
 			cfg.root = optarg;
 			break;
 		case 'f':
-			set_single_character(optarg, &cfg.delim_between);
+			set_single_character(optarg, &cfg.delim_field);
 			break;
 		case 'i':
 			set_single_character(optarg, &cfg.delim_inner);
@@ -307,7 +314,7 @@ int main(int argc, char **argv)
 		case 'b':
 			cfg.mask_inner |= OPT_BYTES;
 			break;
-		case 'p':
+		case 'P':
 			cfg.mask_output |= OPT_PAIRS;
 			break;
 		case 's':
@@ -354,6 +361,7 @@ int main(int argc, char **argv)
 			add_uniq_output(OUT_SIZE);
 			add_uniq_output(OUT_BUILDDATE);
 			add_uniq_output(OUT_INSTALLDATE);
+
 			break;
 		case 'O':
 			for (noutputs = 0; noutputs < ARRAY_SIZE(infos); noutputs++)
@@ -404,8 +412,10 @@ int main(int argc, char **argv)
 
 			print_lspac(con, cfg);
 			if (i + 1 < noutputs)
-				putchar(cfg.delim_between); /* puts delimiter between packages */
+				putchar(cfg.delim_field); /* puts delimiter between fields */
 		}
+		if (alpm_list_next(v))
+			putchar(cfg.delim_pkg); /* puts delimiter between packages */
 	}
 	putchar('\n'); /* puts newline to output */
 
