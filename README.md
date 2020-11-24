@@ -13,11 +13,69 @@ make
 sudo make install
 ```
 
+
 # Usage
-`lspac [OPTIONS] [PACKAGE]`
+`lspac [OPTIONS] [<PACKAGE> ...]`
 
 ## Options
-TODO: Add options list.
+`-d, --dbpath PATH`
+
+Set pacman dbpath.
+
+`-f, --field-delim CHAR`
+
+Set the field used between each selected output field (default: tab).
+
+`-i, --inner-delim CHAR`
+
+Set the inner values delimiter (default: space).
+
+`-o, --output LIST`
+
+Set the output fields list (for more information, refer to `lspac --help`).
+
+`-r, --root PATH`
+
+Set the filesystem root dir.
+
+`-s, --surround CHAR`
+
+Set the character used to surround each output value (default: double quotes).
+
+`-b, --bytes`
+
+Display package size as bytes, instead of human readable.
+
+`-p, --pairs`
+
+Show outputs in a KEY="VALUE" fashion.
+
+`-u, --unix`
+
+Display dates as unix timestamp, instead of human readable.
+
+`-w, --raw`
+
+Remove surrounding characters (overwrites -s).
+
+`-B, --basic`
+
+Show basic informations about a package.
+Same as `-o PROVIDES,DEPENDS,CONFLICTS,REPLACES,CHECKDEPENDS,MAKEDEPENDS`
+
+`-R, --relations`
+
+Show the relations of a given package.
+Same as `-o DBNAME,BASENAME,VERSION,DESC,ARCH,URL,PACKAGER,SIZE,BUILDDATE,INSTALLDATE`
+
+`-O, --output-all`
+
+Shows every single available output value.
+
+`-h, --help`
+
+Shows help menu.
+
 
 # Manual page
 For extra help and information about this tool's usage, refer to the `lspac(1)` manual page.
