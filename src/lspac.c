@@ -19,9 +19,9 @@
 
 /* so much very scalable!!1!eleven */
 enum {
-	OPT_PAIRS 	= (1 << 1),
-	OPT_LOCAL 	= (1 << 2),
-	OPT_SYNC 	= (1 << 3),
+	OPT_PAIRS 	= (1 << 0),
+	OPT_LOCAL 	= (1 << 1),
+	OPT_SYNC 	= (1 << 2),
 };
 
 struct config {
