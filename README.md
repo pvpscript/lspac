@@ -85,10 +85,17 @@ Shows help menu.
 For extra help and information about this tool's usage, refer to the `lspac(1)` manual page.
 
 # Reference
-The library used was the pacman `libalpm` which is provided with the core pacman package.
-It's source code can be found [here](https://github.com/devkitPro/pacman).
+This project was strongly inspired by `lsblk`, a tool from
+[util-linux](https://github.com/karelzak/util-linux/) that lists block devices.
+By reading its code, I was able to absorb enough information in how a proper
+input parsing is done, as well as the clever `enum` + `struct array` solution
+for associating numerical values with strings and their respective information.
+I really recommend taking a look at the code, it's very concise and very well
+written; a delightful experience to the eyes and mind of every programmer.
 
-Note that there's still no manual page for this library, as they claim it is still under construction,
+The library used was the pacman `libalpm` which is provided with the core pacman package.
+It's source code can be found [here](https://github.com/devkitPro/pacman). Note that
+there's still no manual page for this library, as they claim it is still under construction,
 but the header file might be able to provide enough information for some development.
 
 Another important project that helped a lot in the development of this tool, was `pacutils`,
