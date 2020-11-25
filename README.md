@@ -80,6 +80,10 @@ Shows every single available output value.
 
 Shows help menu.
 
+`-v, --version`
+
+Displays version.
+
 
 # Manual page
 For extra help and information about this tool's usage, refer to the `lspac(1)` manual page.
