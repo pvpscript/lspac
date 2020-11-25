@@ -134,7 +134,7 @@ struct container *lspac_pkg_get_installdate(void *data, char *prefix)
 
 struct container *lspac_pkg_has_scriptlet(void *data, char *prefix)
 {
-	return has_scriptlet(alpm_pkg_has_scriptlet(data), prefix);
+	return get_boolean(alpm_pkg_has_scriptlet(data), prefix);
 }
 
 struct container *lspac_pkg_get_validation(void *data, char *prefix)

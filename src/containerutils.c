@@ -124,7 +124,7 @@ struct container *get_dbname(alpm_db_t *db, char *prefix)
 	return str_to_container((char *)alpm_db_get_name(db), prefix);
 }
 
-struct container *has_scriptlet(int b, char *prefix)
+struct container *get_boolean(int b, char *prefix)
 {
 	return str_to_container(b ? "Yes" : "No", prefix);
 }

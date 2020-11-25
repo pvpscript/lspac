@@ -33,7 +33,7 @@ struct container *get_size(off_t size, char *prefix);
 struct container *get_required_by(alpm_pkg_t *pkg, char *prefix);
 struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix);
 struct container *get_dbname(alpm_db_t *db, char *prefix);
-struct container *has_scriptlet(int b, char *prefix);
+struct container *get_boolean(int b, char *prefix);
 struct container *get_reason(alpm_pkgreason_t r, char *prefix);
 struct container *get_validation(alpm_pkgvalidation_t v, char *prefix);
 
