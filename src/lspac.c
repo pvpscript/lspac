@@ -234,6 +234,8 @@ static void usage()
 
 	for (i = 0; i < ARRAY_SIZE(infos); i++)
 		printf(" %14s %s\n", infos[i].name, infos[i].desc);
+
+	exit(EXIT_SUCCESS);
 }
 
 int main(int argc, char **argv)
