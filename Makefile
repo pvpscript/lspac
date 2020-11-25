@@ -13,7 +13,7 @@ CFLAGS = ${CMPTIME} ${DEBUG} ${LIBS} -I${INC_DIR} -std=c99 -pedantic -Wall
 
 BIN = lspac
 
-PREFIX = /usr/local
+PREFIX = /usr
 MANPREFIX = ${PREFIX}/share/man
 
 SRC = ${wildcard ${SRC_DIR}/*.c}
@@ -38,7 +38,7 @@ install: all
 	cp -f ${BIN} ${DESTDIR}${PREFIX}/bin
 	chmod 755 ${DESTDIR}${PREFIX}/bin/${BIN}
 	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	cp -f ${MAN_DIR}/${BIN}.1 ${DESTDIR}${MANPREFIX}/man1/${BIN}.1
+	cp -f ${MAN_DIR}/${BIN}.1 ${DESTDIR}${MANPREFIX}/man1
 	chmod 644 ${DESTDIR}${MANPREFIX}/man1/${BIN}.1
 
 uninstall:
