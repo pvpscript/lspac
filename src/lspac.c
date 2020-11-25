@@ -272,7 +272,7 @@ int main(int argc, char **argv)
 		{"root",	required_argument,	NULL,	'r'},
 		{"surround",	required_argument,	NULL,	's'},
 		{"dbext",	required_argument,	NULL,	'x'},
-		{"select-db",	required_argument,	NULL,	'S'}, /* select between local and sync */
+		{"select-db",	required_argument,	NULL,	'S'},
                 {"bytes",       no_argument,            NULL,   'b'},
                 {"unix",        no_argument,            NULL,   'u'},
 		{"raw",		no_argument,		NULL,	'w'},
@@ -282,13 +282,6 @@ int main(int argc, char **argv)
 		{"relations", 	no_argument,		NULL,	'R'},
 		{"help",	no_argument,		NULL,	'h'}
         };
-
-	/*
-	 * raw: don't put any surrounding and makes space the default delimiter
-	 * local-only: fetch packages only from the localdb;
-	 * sync-only: fetch packages only from the syncdb;
-	 * dbext: add extra sync db extensions;
-	 */
 
         while ((c = getopt_long(argc, argv, "d:f:i:o:p:s:r:x:S:bpuwBOPRh",
 				long_options, &opt_index)) != -1) {
