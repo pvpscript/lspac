@@ -197,7 +197,7 @@ static void fmt_help(const char *cmd, const char *desc)
 static void set_single_character(char *optarg, char *field_ref)
 {
 	if (strlen(optarg) > 1) {
-		fprintf(stderr, "Delimiter must be a single character\n");
+		fprintf(stderr, "error: delimiter must be a single character.\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -292,7 +292,6 @@ int main(int argc, char **argv)
 				long_options, &opt_index)) != -1) {
                 switch(c) {
 		case 'd':
-			puts(optarg);
 			cfg.dbpath = optarg;
 			break;
 		case 'o':
@@ -331,7 +330,7 @@ int main(int argc, char **argv)
 			} else if (!strcmp(optarg, "sync")) {
 				cfg.mask_output &= ~OPT_LOCAL;
 			} else {
-				fprintf(stderr, "Unknown database %s\n", optarg);
+				fprintf(stderr, "error: unknown database '%s'.\n", optarg);
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -348,7 +347,6 @@ int main(int argc, char **argv)
 			add_uniq_output(OUT_REPLACES);
 			add_uniq_output(OUT_CHECKDEPENDS);
 			add_uniq_output(OUT_MAKEDEPENDS);
-
 			break;
 		case 'R':
 			add_uniq_output(OUT_DBNAME);
@@ -361,7 +359,6 @@ int main(int argc, char **argv)
 			add_uniq_output(OUT_SIZE);
 			add_uniq_output(OUT_BUILDDATE);
 			add_uniq_output(OUT_INSTALLDATE);
-
 			break;
 		case 'O':
 			for (noutputs = 0; noutputs < ARRAY_SIZE(infos); noutputs++)
@@ -390,7 +387,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 
 	if (optind == argc) {
-		fprintf(stderr, "Must provide at least one package name\n");
+		fprintf(stderr, "error: must provide at least one package name.\n");
 		exit(EXIT_FAILURE);
 	} else if (argc > optind) {
 		for (; optind < argc; optind++) {
@@ -399,7 +396,7 @@ int main(int argc, char **argv)
 			if ((pkg = alpm_db_get_pkg(db, pkgarg))) {
 				pkg_list = alpm_list_add(pkg_list, pkg);
 			} else {
-				fprintf(stderr, "Package %s not found.\n", pkgarg);
+				fprintf(stderr, "error: package '%s' not found.\n", pkgarg);
 				exit(EXIT_FAILURE);
 			}
 		}
