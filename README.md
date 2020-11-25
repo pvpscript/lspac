@@ -1,6 +1,6 @@
 # Introduction
 **lspac** is a helper tool for `pacman`, built using the `libalpm` library.
-It's main purpose is to fetch information about local packages on Arch Linux
+It's main purpose is to fetch information about packages from `pacman`
 and print it to the `stdout` in a way that it's friendly for parsing, so
 it facilitates the creation of scripts that deals with pacman package information.
 
