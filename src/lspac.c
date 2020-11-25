@@ -39,7 +39,7 @@ struct config {
 	unsigned mask_output; 
 
 	/* inner options */
-	unsigned mask_inner;
+	unsigned mask_con;
 };
 
 enum {
@@ -246,7 +246,7 @@ int main(int argc, char **argv)
 		.delim_pkg = DEFAULT_DELIM_PKG,
 		.surround = DEFAULT_SURROUND,
 		.mask_output = OPT_LOCAL & OPT_SYNC,
-		.mask_inner = 0,
+		.mask_con = 0,
 		.root = "/",
 		.dbpath = "/var/lib/pacman/"
 	};
@@ -313,7 +313,7 @@ int main(int argc, char **argv)
 			set_single_character(optarg, &cfg.delim_inner);
 			break;
 		case 'b':
-			cfg.mask_inner |= OPT_BYTES;
+			cfg.mask_con |= OPT_BYTES;
 			break;
 		case 'P':
 			cfg.mask_output |= OPT_PAIRS;
@@ -340,7 +340,7 @@ int main(int argc, char **argv)
 			cfg.surround = 0;
 			break;
 		case 'u':
-			cfg.mask_inner |= OPT_UNIX;
+			cfg.mask_con |= OPT_UNIX;
 			break;
 		case 'B':
 			add_uniq_output(OUT_PROVIDES);
@@ -374,6 +374,8 @@ int main(int argc, char **argv)
 			exit(EXIT_FAILURE);
                 }
         }
+
+	set_bitmask(cfg.mask_con);
 
 	handle = alpm_initialize(cfg.root, cfg.dbpath, NULL);
 	db = alpm_get_localdb(handle); /* only works with local db for now */
