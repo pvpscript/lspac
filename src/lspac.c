@@ -229,6 +229,7 @@ static void usage()
 	fmt_help(" -O, --output-all", "shows every single available output");
 
 	fmt_help("\n -h, --help", "displays this help");
+	fmt_help(" -v, --version", "display version");
 
 	puts("\nAvailable output values:");
 
@@ -275,6 +276,7 @@ int main(int argc, char **argv)
 		{"select-db",	required_argument,	NULL,	'S'},
                 {"bytes",       no_argument,            NULL,   'b'},
                 {"unix",        no_argument,            NULL,   'u'},
+		{"version",	no_argument,		NULL,	'v'},
 		{"raw",		no_argument,		NULL,	'w'},
 		{"basic",	no_argument,		NULL,	'B'},
 		{"output-all",	no_argument,		NULL,	'O'},
@@ -283,7 +285,7 @@ int main(int argc, char **argv)
 		{"help",	no_argument,		NULL,	'h'}
         };
 
-        while ((c = getopt_long(argc, argv, "d:f:i:o:p:s:r:x:S:bpuwBOPRh",
+        while ((c = getopt_long(argc, argv, "d:f:i:o:p:s:r:x:S:bpuvwBOPRh",
 				long_options, &opt_index)) != -1) {
                 switch(c) {
 		case 'd':
@@ -361,7 +363,9 @@ int main(int argc, char **argv)
 			break;
 		case 'h':
 			usage();
-			break;
+		case 'v':
+			printf("lsblk %s\n", VERSION);
+			exit(EXIT_SUCCESS);
 		default:
 			fprintf(stderr, "Try 'lspac --help' for more information\n");
 			exit(EXIT_FAILURE);

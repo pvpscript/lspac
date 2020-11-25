@@ -1,3 +1,5 @@
+VERSION = 1.0.0
+
 SRC_DIR = src
 OBJ_DIR = obj
 MAN_DIR = doc
@@ -5,8 +7,9 @@ INC_DIR = include
 
 CC = cc
 DEBUG = -g
-LIBS=-l alpm
-CFLAGS = ${DEBUG} ${LIBS} -I${INC_DIR} -std=c99 -pedantic -Wall
+LIBS = -l alpm
+CMPTIME = -DVERSION=\"${VERSION}\"
+CFLAGS = ${CMPTIME} ${DEBUG} ${LIBS} -I${INC_DIR} -std=c99 -pedantic -Wall
 
 BIN = lspac
 
