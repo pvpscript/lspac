@@ -1,0 +1,80 @@
+.TH LSPAC 1
+.SH NAME
+lspac \- A tool for fetching pacman packages data in a parsing friendly way.
+
+.SH SYNOPSIS
+.B lspac
+[\fB\fIOPTIONS\fR]
+[\fI<PACKAGE> ...\fR]
+
+.SH DESCRIPTION
+.B lspac
+is a helper tool for pacman, built using the
+.B libalpm
+library. It's main purpose is to fetch information about local packages from
+.B pacman
+and print it to the stdout in a way that it's friendly for parsing, so it
+facilitates the creation of scripts that deals with
+.B pacman
+package information.
+
+.SH OPTIONS
+.TP
+.BR "-r, --root \fIPATH\fR"
+Set the filesystem root dir.
+.TP
+.BR "-d, --dbpath \fIPATH\fR"
+Set pacman dbpath.
+.TP
+.BR "-f, --field-delim \fICHAR\fR"
+Set the field used between each selected output field (default: tab).
+.TP
+.BR "-i, --inner-delim \fICHAR\fR"
+Set the inner values delimiter (default: space).
+.TP
+.BR "-p, --pkg-delim \fICHAR\fR"
+Set the delimiter used between each prompted package.
+.TP
+.BR "-s, --surround \fICHAR\fR"
+Set the character used to surround each output value (default: double quotes).
+.TP
+.BR "-o, --output \fILIST\fR"
+Set the output fields list. For a complete list of outputs, refer to
+.BR "lspac --help"
+.TP
+.BR "-O, --output-all"
+Shows every single available output value.
+.TP
+.BR "-P, --pairs"
+Show outputs in a KEY="VALUE" fashion.
+.TP
+.BR "-b, --bytes"
+Display package size as bytes, instead of human readable.
+.TP
+.BR "-u, --unix"
+Display dates as unix timestamp, instead of human readable.
+.TP
+.BR "-w, --raw"
+Remove surrounding characters (overwrites -s).
+.TP
+.BR "-B, --basic"
+Show basic informations about a package.
+Same as 
+.BR "-o PROVIDES,DEPENDS,CONFLICTS,REPLACES,CHECKDEPENDS,MAKEDEPENDS"
+.TP
+.BR "-R, --relations"
+Show the relations of a given package.
+Same as 
+.BR "-o DBNAME,BASENAME,VERSION,DESC,ARCH,URL,PACKAGER,SIZE,BUILDDATE,INSTALLDATE"
+.TP
+.BR "-h, --help"
+Shows help menu.
+.TP
+.BR "-v, --version"
+Displays version.
+
+.SH EXIT STATUS
+.IP 0
+success
+.IP 1
+failure
