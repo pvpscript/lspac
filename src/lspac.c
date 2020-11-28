@@ -364,7 +364,7 @@ int main(int argc, char **argv)
 		case 'h':
 			usage();
 		case 'v':
-			printf("lsblk %s\n", VERSION);
+			printf("lspac %s\n", VERSION);
 			exit(EXIT_SUCCESS);
 		default:
 			fprintf(stderr, "Try 'lspac --help' for more information\n");
