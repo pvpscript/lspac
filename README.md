@@ -5,6 +5,19 @@ and print it to the `stdout` in a way that it's friendly for parsing, so
 it facilitates the creation of scripts that deals with pacman package information.
 
 # Installation
+
+## AUR
+`yay -S lspac`
+
+or
+
+```
+git clone aur.archlinux.org/lspac
+cd lspac
+makepkg -si
+```
+
+## Manual
 To install `lspac` simply follow the steps below:
 ```
 git clone https://github.com/pvpscript/lspac
