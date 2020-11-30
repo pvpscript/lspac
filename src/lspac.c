@@ -35,6 +35,9 @@ struct config {
 	char *root;
 	char *dbpath;
 
+        /* pacman config file */
+        char *pacman_conf;
+
 	/* output option */
 	unsigned mask_output; 
 
@@ -214,6 +217,7 @@ static void usage()
 	puts("\nList information about pacman packages");
 
 	puts("\nOptions:");
+        fmt_help(" -c, --pacman-conf", "set the pacman config file");
 	fmt_help(" -d, --dbpath", "database path");
 	fmt_help(" -f, --field-delim", "set the field delimiter (default: tab)");
 	fmt_help(" -i, --inner-delim", "set the inner values delimiter (default: space)");
@@ -239,6 +243,24 @@ static void usage()
 	exit(EXIT_SUCCESS);
 }
 
+void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
+{
+        FILE *f = fopen(cfg.pacman_conf, "r");
+        char buf[255];
+        size_t namesz;
+
+        while (fgets(buf, 255, f)) {
+                if (*buf == '[' && strncmp(buf, "[options]", 9)) {
+                        namesz = strlen(buf);
+                        buf[namesz - 2] = 0;
+
+                        alpm_register_syncdb(handle, buf + 1, 0);
+                }
+        }
+
+        fclose(f);
+}
+
 int main(int argc, char **argv)
 {
 	struct config cfg = {
@@ -246,18 +268,19 @@ int main(int argc, char **argv)
 		.delim_field = DEFAULT_DELIM_FIELD,
 		.delim_pkg = DEFAULT_DELIM_PKG,
 		.surround = DEFAULT_SURROUND,
-		.mask_output = OPT_LOCAL & OPT_SYNC,
+		.mask_output = OPT_LOCAL | OPT_SYNC,
 		.mask_con = 0,
 		.root = "/",
-		.dbpath = "/var/lib/pacman/"
+		.dbpath = "/var/lib/pacman/",
+                .pacman_conf = "/etc/pacman.conf"
 	};
 	char *outarg = NULL;
 
 	alpm_handle_t *handle;
+	alpm_list_t *dbs = NULL;
 	alpm_list_t *pkg_list = NULL;
 	alpm_list_t *v;
 	alpm_pkg_t *pkg;
-	alpm_db_t *db;
 	char *pkgarg;
 
 	struct container *con;
@@ -265,6 +288,7 @@ int main(int argc, char **argv)
         char c;
         int opt_index = 0;
         static struct option long_options[] = {
+                {"pacman-conf", required_argument,      NULL,   'c'}, /* custom path for pacman config file */
 		{"dbpath",	required_argument,	NULL,	'd'},
                 {"field-delim",	required_argument,      NULL,   'f'},
                 {"inner-delim",	required_argument,      NULL,   'i'},
@@ -285,9 +309,12 @@ int main(int argc, char **argv)
 		{"help",	no_argument,		NULL,	'h'}
         };
 
-        while ((c = getopt_long(argc, argv, "d:f:i:o:p:s:r:x:S:bpuvwBOPRh",
+        while ((c = getopt_long(argc, argv, "c:d:f:i:o:p:s:r:x:S:bpuvwBOPRh",
 				long_options, &opt_index)) != -1) {
                 switch(c) {
+                case 'c':
+                        cfg.pacman_conf = optarg;
+                        break;
 		case 'd':
 			cfg.dbpath = optarg;
 			break;
@@ -375,7 +402,13 @@ int main(int argc, char **argv)
 	set_bitmask(cfg.mask_con);
 
 	handle = alpm_initialize(cfg.root, cfg.dbpath, NULL);
-	db = alpm_get_localdb(handle); /* only works with local db for now */
+        if (cfg.mask_output & OPT_LOCAL)
+                dbs = alpm_list_add(dbs, alpm_get_localdb(handle));
+        if (cfg.mask_output & OPT_SYNC) {
+                register_sync_dbs(handle, cfg);
+                FOREACH_ALPM_ITEM(v, alpm_get_syncdbs(handle))
+                        dbs = alpm_list_add(dbs, v->data);
+        }
 
         if (!noutputs) {
                 add_uniq_output(OUT_DBNAME);
@@ -394,12 +427,18 @@ int main(int argc, char **argv)
 		for (; optind < argc; optind++) {
 			pkgarg = argv[optind];
 
-			if ((pkg = alpm_db_get_pkg(db, pkgarg))) {
-				pkg_list = alpm_list_add(pkg_list, pkg);
-			} else {
-				fprintf(stderr, "error: package '%s' not found.\n", pkgarg);
-				exit(EXIT_FAILURE);
-			}
+                        FOREACH_ALPM_ITEM(v, dbs) {
+                                if ((pkg = alpm_db_get_pkg(v->data, pkgarg)))
+                                        pkg_list = alpm_list_add(pkg_list,
+                                                                 pkg);
+                        }
+
+                        if (alpm_list_count(pkg_list) == 0) {
+				fprintf(stderr, "error: package '%s' not found"
+                                                " in any given database\n",
+                                                pkgarg);
+                                exit(EXIT_FAILURE);
+                        }
 		}
 	}
 
