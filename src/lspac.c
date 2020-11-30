@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 
 	struct container *con;
 
-        char c;
+        int c;
         int opt_index = 0;
         static struct option long_options[] = {
                 {"pacman-conf", required_argument,      NULL,   'c'}, /* custom path for pacman config file */
