@@ -219,14 +219,17 @@ static void usage()
 
 	puts("\nOptions:");
         fmt_help(" -c, --pacman-conf", "set the pacman config file");
-	fmt_help(" -d, --dbpath", "database path");
+	fmt_help(" -d, --dbpath", "database path (default: '/var/lib/pacman/')");
+	fmt_help(" -r, --root", "filesystem root (default: '/')");
 	fmt_help(" -f, --field-delim", "set the field delimiter (default: tab)");
 	fmt_help(" -i, --inner-delim", "set the inner values delimiter (default: space)");
+        fmt_help(" -p, --pkg-delim", "set the delimiter used between packages (default: newline)");
 	fmt_help(" -o, --output", "output fields");
-	fmt_help(" -r, --root", "filesystem root");
 	fmt_help(" -s, --surround", "character used to surround each output (default: double quotes)");
+        fmt_help(" -t, --tarball", "fetches data from a given package tarball");
+        fmt_help(" -S, --select-db", "select between local db and sync dbs (default: both)");
 	fmt_help(" -b, --bytes", "display size as bytes, instead of human readable");
-	fmt_help(" -p, --pairs", "show outputs in a KEY=\"VALUE\" fashion");
+	fmt_help(" -P, --pairs", "show outputs in a KEY=\"VALUE\" fashion");
 	fmt_help(" -u, --unix", "display dates as unix timestamp, instead of human readable");
 	fmt_help(" -w, --raw", "remove surrounding character (overwrites -s)");
 	fmt_help(" -B, --basic", "show basic informations about a package");
@@ -366,8 +369,6 @@ int main(int argc, char **argv)
                         cfg.mask_output |= OPT_TARBALL;
                         pkg_name = optarg;
                         break;
-		case 'x':
-			break;
 		case 'S':
 			/* only local db available for now! */
 	
