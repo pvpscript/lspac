@@ -201,7 +201,7 @@ static void fmt_help(const char *cmd, const char *desc)
 static void set_single_character(char *optarg, char *field_ref)
 {
 	if (strlen(optarg) > 1) {
-		fprintf(stderr, "error: delimiter must be a single character.\n");
+		fprintf(stderr, "error: delimiter must be a single character\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -254,7 +254,7 @@ void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
         size_t namesz;
 
         if (f == NULL) {
-                fprintf(stderr, "error: pacman config file '%s' not found.\n",
+                fprintf(stderr, "error: pacman config file '%s' not found\n",
                                 cfg.pacman_conf);
                 exit(EXIT_FAILURE);
         }
@@ -298,6 +298,7 @@ int main(int argc, char **argv)
 	alpm_handle_t *handle;
 	alpm_list_t *dbs = NULL;
 	alpm_list_t *pkg_list = NULL;
+        alpm_list_t *tmp_pkg_list = NULL;
 	alpm_list_t *v;
 	alpm_pkg_t *pkg;
 	char *pkgarg;
@@ -377,7 +378,7 @@ int main(int argc, char **argv)
 			} else if (!strcmp(optarg, "sync")) {
 				cfg.mask_output &= ~OPT_LOCAL;
 			} else {
-				fprintf(stderr, "error: unknown database '%s'.\n", optarg);
+				fprintf(stderr, "error: unknown database '%s'\n", optarg);
 				exit(EXIT_FAILURE);
 			}
 			break;
@@ -425,7 +426,7 @@ int main(int argc, char **argv)
 	set_bitmask(cfg.mask_con);
 
 	if (!(handle = alpm_initialize(cfg.root, cfg.dbpath, NULL))) {
-                fprintf(stderr, "error: unable to initialize alpm.\n");
+                fprintf(stderr, "error: unable to initialize alpm\n");
                 exit(EXIT_FAILURE);
         }
 
@@ -457,7 +458,7 @@ int main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 
 	if (optind == argc && !(cfg.mask_output & OPT_TARBALL)) {
-		fprintf(stderr, "error: must provide at least one package name.\n");
+		fprintf(stderr, "error: must provide at least one package name\n");
 		exit(EXIT_FAILURE);
 	} else if (argc > optind) {
 		for (; optind < argc; optind++) {
@@ -465,17 +466,17 @@ int main(int argc, char **argv)
 
                         FOREACH_ALPM_ITEM(v, dbs) {
                                 if ((pkg = alpm_db_get_pkg(v->data, pkgarg)))
-                                        pkg_list = alpm_list_add(pkg_list,
-                                                                 pkg);
+                                        tmp_pkg_list = alpm_list_add(tmp_pkg_list, pkg);
                         }
 
-                        if (alpm_list_count(pkg_list) == 0 ||
-                                        ((cfg.mask_output & OPT_TARBALL) && 
-                                         alpm_list_count(pkg_list) == 1)) {
+                        if (!tmp_pkg_list) {
 				fprintf(stderr, "error: package '%s' not found"
                                                 " in any given database\n",
                                                 pkgarg);
                                 exit(EXIT_FAILURE);
+                        } else {
+                                pkg_list = alpm_list_join(pkg_list, tmp_pkg_list);
+                                tmp_pkg_list = NULL;
                         }
 		}
 	}
