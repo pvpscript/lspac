@@ -249,6 +249,12 @@ void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
         char buf[255];
         size_t namesz;
 
+        if (f == NULL) {
+                fprintf(stderr, "error: pacman config file '%s' not found.\n",
+                                cfg.pacman_conf);
+                exit(EXIT_FAILURE);
+        }
+
         while (fgets(buf, 255, f)) {
                 if (*buf == '[' && strncmp(buf, "[options]", 9)) {
                         namesz = strlen(buf);
@@ -306,7 +312,8 @@ int main(int argc, char **argv)
 		{"output-all",	no_argument,		NULL,	'O'},
                 {"pairs",       no_argument,            NULL,   'P'},
 		{"relations", 	no_argument,		NULL,	'R'},
-		{"help",	no_argument,		NULL,	'h'}
+		{"help",	no_argument,		NULL,	'h'},
+                {NULL, 0, NULL, 0}
         };
 
         while ((c = getopt_long(argc, argv, "c:d:f:i:o:p:s:r:x:S:bpuvwBOPRh",
@@ -401,7 +408,11 @@ int main(int argc, char **argv)
 
 	set_bitmask(cfg.mask_con);
 
-	handle = alpm_initialize(cfg.root, cfg.dbpath, NULL);
+	if (!(handle = alpm_initialize(cfg.root, cfg.dbpath, NULL))) {
+                fprintf(stderr, "error: unable to initialize alpm.\n");
+                exit(EXIT_FAILURE);
+        }
+
         if (cfg.mask_output & OPT_LOCAL)
                 dbs = alpm_list_add(dbs, alpm_get_localdb(handle));
         if (cfg.mask_output & OPT_SYNC) {
@@ -457,6 +468,7 @@ int main(int argc, char **argv)
 	putchar('\n'); /* puts newline to output */
 
 	alpm_list_free(pkg_list);
+        alpm_list_free(dbs);
 	alpm_release(handle);
 
 	return 0;
