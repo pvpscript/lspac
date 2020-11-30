@@ -208,6 +208,41 @@ static void set_single_character(char *optarg, char *field_ref)
 	*field_ref = *optarg;
 }
 
+/*
+ * Search the pacman config file for sync databases
+ */
+static void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
+{
+        FILE *f = fopen(cfg.pacman_conf, "r");
+        char buf[255];
+        size_t namesz;
+
+        if (f == NULL) {
+                fprintf(stderr, "error: pacman config file '%s' not found\n",
+                                cfg.pacman_conf);
+                exit(EXIT_FAILURE);
+        }
+
+        while (fgets(buf, 255, f)) {
+                if (*buf == '[' && strncmp(buf, "[options]", 9)) {
+                        namesz = strlen(buf);
+                        buf[namesz - 2] = 0;
+
+                        alpm_register_syncdb(handle, buf + 1, 0);
+                }
+        }
+
+        fclose(f);
+}
+
+/*
+ * Just to get rid of the warning
+ */
+static void (*alpm_pkg_free_closure(int (*fn)(alpm_pkg_t *)))(void *)
+{
+        return ((void (*)(void *))fn);
+}
+
 static void usage()
 {
 	size_t i;
@@ -245,38 +280,6 @@ static void usage()
 		printf(" %14s %s\n", infos[i].name, infos[i].desc);
 
 	exit(EXIT_SUCCESS);
-}
-
-void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
-{
-        FILE *f = fopen(cfg.pacman_conf, "r");
-        char buf[255];
-        size_t namesz;
-
-        if (f == NULL) {
-                fprintf(stderr, "error: pacman config file '%s' not found\n",
-                                cfg.pacman_conf);
-                exit(EXIT_FAILURE);
-        }
-
-        while (fgets(buf, 255, f)) {
-                if (*buf == '[' && strncmp(buf, "[options]", 9)) {
-                        namesz = strlen(buf);
-                        buf[namesz - 2] = 0;
-
-                        alpm_register_syncdb(handle, buf + 1, 0);
-                }
-        }
-
-        fclose(f);
-}
-
-/*
- * Just to get rid of the warning
- */
-void (*alpm_pkg_free_closure(int (*fn)(alpm_pkg_t *)))(void *)
-{
-        return ((void (*)(void *))fn);
 }
 
 int main(int argc, char **argv)
