@@ -23,6 +23,7 @@ enum {
 	OPT_PAIRS 	= (1 << 0),
 	OPT_LOCAL 	= (1 << 1),
 	OPT_SYNC 	= (1 << 2),
+        OPT_TARBALL     = (1 << 3)
 };
 
 struct config {
@@ -267,6 +268,14 @@ void register_sync_dbs(alpm_handle_t *handle, struct config cfg)
         fclose(f);
 }
 
+/*
+ * Just to get rid of the warning
+ */
+void (*alpm_pkg_free_closure(int (*fn)(alpm_pkg_t *)))(void *)
+{
+        return ((void (*)(void *))fn);
+}
+
 int main(int argc, char **argv)
 {
 	struct config cfg = {
@@ -281,6 +290,7 @@ int main(int argc, char **argv)
                 .pacman_conf = "/etc/pacman.conf"
 	};
 	char *outarg = NULL;
+        char *pkg_name = NULL;
 
 	alpm_handle_t *handle;
 	alpm_list_t *dbs = NULL;
@@ -302,6 +312,7 @@ int main(int argc, char **argv)
 		{"pkg-delim",	required_argument,	NULL,	'p'},
 		{"root",	required_argument,	NULL,	'r'},
 		{"surround",	required_argument,	NULL,	's'},
+                {"tarball",     required_argument,      NULL,   't'}, /* loads package from tarball */
 		{"dbext",	required_argument,	NULL,	'x'},
 		{"select-db",	required_argument,	NULL,	'S'},
                 {"bytes",       no_argument,            NULL,   'b'},
@@ -316,7 +327,7 @@ int main(int argc, char **argv)
                 {NULL, 0, NULL, 0}
         };
 
-        while ((c = getopt_long(argc, argv, "c:d:f:i:o:p:s:r:x:S:bpuvwBOPRh",
+        while ((c = getopt_long(argc, argv, "c:d:f:i:o:p:s:t:r:x:S:bpuvwBOPRh",
 				long_options, &opt_index)) != -1) {
                 switch(c) {
                 case 'c':
@@ -351,6 +362,10 @@ int main(int argc, char **argv)
 			if (cfg.surround) /* check wether it's not raw */
 				set_single_character(optarg, &cfg.surround);
 			break;
+                case 't':
+                        cfg.mask_output |= OPT_TARBALL;
+                        pkg_name = optarg;
+                        break;
 		case 'x':
 			break;
 		case 'S':
@@ -413,6 +428,15 @@ int main(int argc, char **argv)
                 exit(EXIT_FAILURE);
         }
 
+        if (cfg.mask_output & OPT_TARBALL) {
+                if (alpm_pkg_load(handle, pkg_name, 1, 0, &pkg) < 0) {
+                        fprintf(stderr, "error: unable to load package '%s'",
+                                        pkg_name);
+                        exit(EXIT_FAILURE);
+                }
+
+                pkg_list = alpm_list_add(pkg_list, pkg);
+        }
         if (cfg.mask_output & OPT_LOCAL)
                 dbs = alpm_list_add(dbs, alpm_get_localdb(handle));
         if (cfg.mask_output & OPT_SYNC) {
@@ -431,7 +455,7 @@ int main(int argc, char **argv)
 					 &noutputs, output_name_to_id) < 0)
 		exit(EXIT_FAILURE);
 
-	if (optind == argc) {
+	if (optind == argc && !(cfg.mask_output & OPT_TARBALL)) {
 		fprintf(stderr, "error: must provide at least one package name.\n");
 		exit(EXIT_FAILURE);
 	} else if (argc > optind) {
@@ -444,7 +468,9 @@ int main(int argc, char **argv)
                                                                  pkg);
                         }
 
-                        if (alpm_list_count(pkg_list) == 0) {
+                        if (alpm_list_count(pkg_list) == 0 ||
+                                        ((cfg.mask_output & OPT_TARBALL) && 
+                                         alpm_list_count(pkg_list) == 1)) {
 				fprintf(stderr, "error: package '%s' not found"
                                                 " in any given database\n",
                                                 pkgarg);
@@ -467,7 +493,8 @@ int main(int argc, char **argv)
 	}
 	putchar('\n'); /* puts newline to output */
 
-	alpm_list_free(pkg_list);
+	alpm_list_free_inner(pkg_list, alpm_pkg_free_closure(alpm_pkg_free));
+        alpm_list_free(pkg_list);
         alpm_list_free(dbs);
 	alpm_release(handle);
 
