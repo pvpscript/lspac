@@ -11,20 +11,37 @@ lspac \- A tool for fetching pacman packages data in a parsing friendly way.
 .B lspac
 is a helper tool for pacman, built using the
 .B libalpm
-library. It's main purpose is to fetch information about local packages from
+library. It's main purpose is to fetch information about packages from the
 .B pacman
-and print it to the stdout in a way that it's friendly for parsing, so it
-facilitates the creation of scripts that deals with
+databases and print it to the stdout in a way that it's friendly for parsing,
+so it facilitates the creation of scripts that deals with
 .B pacman
 package information.
+The packages are fetch, by default, from the
+.B local
+database, which refers to the installed packages, and the
+.B sync
+databases, which are defined in the
+.B pacman.conf
+configuration file. Usually, the
+.B sync
+databases are
+.B core
+,
+.B extra
+and
+.B community
 
 .SH OPTIONS
 .TP
-.BR "-r, --root \fIPATH\fR"
-Set the filesystem root dir.
+.BR "-c, --pacman-conf \fIPATH\fR"
+Set the pacman config file (default '/etc/pacman.conf').
 .TP
 .BR "-d, --dbpath \fIPATH\fR"
-Set pacman dbpath.
+Set pacman database path (default: '/var/lib/pacman/').
+.TP
+.BR "-r, --root \fIPATH\fR"
+Set the filesystem root dir (default: '/').
 .TP
 .BR "-f, --field-delim \fICHAR\fR"
 Set the field used between each selected output field (default: tab).
@@ -35,21 +52,28 @@ Set the inner values delimiter (default: space).
 .BR "-p, --pkg-delim \fICHAR\fR"
 Set the delimiter used between each prompted package.
 .TP
-.BR "-s, --surround \fICHAR\fR"
-Set the character used to surround each output value (default: double quotes).
-.TP
 .BR "-o, --output \fILIST\fR"
 Set the output fields list. For a complete list of outputs, refer to
 .BR "lspac --help"
 .TP
-.BR "-O, --output-all"
-Shows every single available output value.
+.BR "-s, --surround \fICHAR\fR"
+Set the character used to surround each output value (default: double quotes).
 .TP
-.BR "-P, --pairs"
-Show outputs in a KEY="VALUE" fashion.
+.BR "-t, --tarball \fIPATH\fR"
+Fetches data from a given package tarball.
+.TP
+.BR "-S, --select-db \fIDATABASE\fR"
+select between
+.B local
+database and
+.B sync
+databases (default: both).
 .TP
 .BR "-b, --bytes"
 Display package size as bytes, instead of human readable.
+.TP
+.BR "-P, --pairs"
+Show outputs in a KEY="VALUE" fashion.
 .TP
 .BR "-u, --unix"
 Display dates as unix timestamp, instead of human readable.
@@ -67,11 +91,14 @@ Show the relations of a given package.
 Same as 
 .BR "-o DBNAME,BASENAME,VERSION,DESC,ARCH,URL,PACKAGER,SIZE,BUILDDATE,INSTALLDATE"
 .TP
-.BR "-h, --help"
-Shows help menu.
+.BR "-O, --output-all"
+Shows every single available output value.
 .TP
 .BR "-v, --version"
 Displays version.
+.TP
+.BR "-h, --help"
+Shows help menu.
 
 .SH EXIT STATUS
 .IP 0
