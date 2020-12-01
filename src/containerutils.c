@@ -65,6 +65,9 @@ struct container *get_time(alpm_time_t time, char *prefix)
 	return c;
 }
 
+/* 
+ * Formats bytes to human readable size.
+ */
 static void fmt_human_readable_size(off_t bytes, char *output) {
 	double d_bytes = (double) bytes;
 	static char *suffix[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB",
