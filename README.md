@@ -12,7 +12,7 @@ it facilitates the creation of scripts that deals with pacman package informatio
 or
 
 ```
-git clone aur.archlinux.org/lspac
+git clone https://aur.archlinux.org/lspac
 cd lspac
 makepkg -si
 ```
