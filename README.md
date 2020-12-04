@@ -31,9 +31,17 @@ sudo make install
 `lspac [OPTIONS] [<PACKAGE> ...]`
 
 ## Options
+`-c, --pacman-conf PATH`
+
+Set the pacman config file (default '/etc/pacman.conf').
+
 `-d, --dbpath PATH`
 
 Set pacman dbpath.
+
+`-r, --root PATH`
+
+Set the filesystem root dir.
 
 `-f, --field-delim CHAR`
 
@@ -43,21 +51,25 @@ Set the field used between each selected output field (default: tab).
 
 Set the inner values delimiter (default: space).
 
-`-o, --output LIST`
-
-Set the output fields list (for more information, refer to `lspac --help`).
-
 `-p, --pkg-delim CHAR`
 
 Set the delimiter used between each prompted package.
 
-`-r, --root PATH`
+`-o, --output LIST`
 
-Set the filesystem root dir.
+Set the output fields list (for more information, refer to `lspac --help`).
 
 `-s, --surround CHAR`
 
 Set the character used to surround each output value (default: double quotes).
+
+`-t, --tarball PATH`
+
+Fetches data from a given package tarball.
+
+`-S, --select-db DATABASE`
+
+Select between `local` database and `sync` databases (default: both).
 
 `-b, --bytes`
 
