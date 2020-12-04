@@ -5,8 +5,11 @@ and print it to the `stdout` in a way that it's friendly for parsing, so
 it facilitates the creation of scripts that deals with pacman package information.
 
 # Installation
+To install `lspac` simply follow one of the methods below:
 
 ## AUR
+Using the AUR
+
 `yay -S lspac`
 
 or
@@ -18,7 +21,8 @@ makepkg -si
 ```
 
 ## Manual
-To install `lspac` simply follow the steps below:
+Manual installation
+
 ```
 git clone https://github.com/pvpscript/lspac
 cd lspac
