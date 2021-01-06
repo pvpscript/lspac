@@ -83,26 +83,6 @@ struct container *get_size(off_t size, char *prefix);
  * @param prefix: a container prefix
  * @returns a pointer to a new container
  */
-struct container *get_required_by(alpm_pkg_t *pkg, char *prefix);
-
-/*
- * Creates a container that holds an array of strings representing the
- * packages optionally required by the given package
- *
- * @param pkg: an alpm package
- * @param prefix: a container prefix
- * @returns a pointer to a new container
- */
-struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix);
-
-/*
- * Creates a container that holds a string representing the name of a
- * alpm database
- *
- * @param db: an alpm database
- * @param prefix: a container prefix
- * @returns a pointer to a new container
- */
 struct container *get_dbname(alpm_db_t *db, char *prefix);
 
 /*

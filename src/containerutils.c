@@ -94,34 +94,6 @@ struct container *get_size(off_t size, char *prefix)
 	return c;
 }
 
-struct container *get_required_by(alpm_pkg_t *pkg, char *prefix)
-{
-	struct container *c = empty_container(prefix);
-	alpm_list_t *content = alpm_pkg_compute_requiredby(pkg);
-	alpm_list_t *v;
-
-	FOREACH_ALPM_ITEM(v, content)
-		put_str(c, v->data);
-
-	alpm_list_free(content);
-
-	return c;
-}
-
-struct container *get_optional_for(alpm_pkg_t *pkg, char *prefix)
-{
-	struct container *c = empty_container(prefix);
-	alpm_list_t *content = alpm_pkg_compute_optionalfor(pkg);
-	alpm_list_t *v;
-
-	FOREACH_ALPM_ITEM(v, content)
-		put_str(c, v->data);
-
-	alpm_list_free(content);
-
-	return c;
-}
-
 struct container *get_dbname(alpm_db_t *db, char *prefix)
 {
 	return str_to_container((char *)alpm_db_get_name(db), prefix);
