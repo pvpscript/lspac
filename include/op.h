@@ -145,6 +145,26 @@ struct container *lspac_pkg_get_groups(void *data, char *prefix);
  * @param prefix: a container prefix
  * @returns a pointer to a container
  */
+struct container *lspac_pkg_compute_requiredby(void *data, char *prefix);
+
+/*
+ * Creates a container that holds an array of strings representing packages
+ * provided by the given package
+ *
+ * @param data: an alpm package
+ * @param prefix: a container prefix
+ * @returns a pointer to a container
+ */
+struct container *lspac_pkg_compute_optionalfor(void *data, char *prefix);
+
+/*
+ * Creates a container that holds an array of strings representing packages
+ * that have the given package as an optional dependecy
+ *
+ * @param data: an alpm package
+ * @param prefix: a container prefix
+ * @returns a pointer to a container
+ */
 struct container *lspac_pkg_get_provides(void *data, char *prefix);
 
 /*

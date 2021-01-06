@@ -71,6 +71,8 @@ enum {
         OUT_REPLACES,
         OUT_CHECKDEPENDS,
         OUT_MAKEDEPENDS,
+	OUT_REQUIREDBY,
+	OUT_OPTIONALFOR,
 };
 
 struct outinfo {
@@ -107,6 +109,8 @@ static struct outinfo infos[] = {
         [OUT_REPLACES] 		= { "REPLACES", "Packages replaces by given package", &lspac_pkg_get_replaces },
         [OUT_CHECKDEPENDS]	= { "CHECKDEPENDS", "Package's check dependencies", &lspac_pkg_get_checkdepends },
         [OUT_MAKEDEPENDS] 	= { "MAKEDEPENDS", "Package's make dependencies", &lspac_pkg_get_makedepends },
+        [OUT_REQUIREDBY] 	= { "REQUIREDBY", "Packages required by the given package", &lspac_pkg_compute_requiredby },
+        [OUT_OPTIONALFOR] 	= { "OPTIONALFOR", "Packages that have the given package as an optional dependency", &lspac_pkg_compute_optionalfor },
 };
 
 static int outputs[ARRAY_SIZE(infos) * 2];
@@ -394,6 +398,8 @@ int main(int argc, char **argv)
 		case 'B':
 			add_uniq_output(OUT_PROVIDES);
 			add_uniq_output(OUT_DEPENDS);
+			add_uniq_output(OUT_REQUIREDBY);
+			add_uniq_output(OUT_OPTIONALFOR);
 			add_uniq_output(OUT_CONFLICTS);
 			add_uniq_output(OUT_REPLACES);
 			add_uniq_output(OUT_CHECKDEPENDS);

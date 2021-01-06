@@ -66,6 +66,16 @@ struct container *lspac_pkg_get_base64_sig(void *data, char *prefix)
 
 /* ---------- */
 
+struct container *lspac_pkg_compute_requiredby(void *data, char *prefix)
+{
+	return list_to_container(alpm_pkg_compute_requiredby(data), prefix);
+}
+
+struct container *lspac_pkg_compute_optionalfor(void *data, char *prefix)
+{
+	return list_to_container(alpm_pkg_compute_optionalfor(data), prefix);
+}
+
 struct container *lspac_pkg_get_licenses(void *data, char *prefix)
 {
 	return list_to_container(alpm_pkg_get_licenses(data), prefix);
