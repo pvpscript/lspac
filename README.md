@@ -94,7 +94,7 @@ Remove surrounding characters (overwrites -s).
 `-B, --basic`
 
 Show basic informations about a package.
-Same as `-o PROVIDES,DEPENDS,CONFLICTS,REPLACES,CHECKDEPENDS,MAKEDEPENDS`
+Same as `-o PROVIDES,DEPENDS,REQUIREDBY,OPTIONALFOR,CONFLICTS,REPLACES,CHECKDEPENDS,MAKEDEPENDS`
 
 `-R, --relations`
 
